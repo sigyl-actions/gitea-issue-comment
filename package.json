@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
+    "@actions/github": "^6.0.0",
     "gitea-api": "^1.17.3-1"
   }
 }
