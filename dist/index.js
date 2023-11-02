@@ -39249,7 +39249,7 @@ async function run() {
   try {
     const serverUrl = _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('serverUrl')
       || (_actions_github__WEBPACK_IMPORTED_MODULE_3__.context.runId && _actions_github__WEBPACK_IMPORTED_MODULE_3__.context.serverUrl)
-      || 'https://sigyl.com/git'
+      || process.argv[3]
 
     const client = new gitea_api__WEBPACK_IMPORTED_MODULE_4__/* .GiteaApi */ .D9({
       BASE: `${serverUrl}/api/v1`,
@@ -39259,158 +39259,23 @@ async function run() {
     const [owner, repo] = (
       _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('repository')
       || _actions_github__WEBPACK_IMPORTED_MODULE_3__?.context?.payload?.repository?.full_name
-      || 'actions/batch-example'
+      || process.argv[4]
     ).split("/");
-    const teams = _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('teams')
-      ? _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('teams').split(',')
-      : [
-        "reviewers",
-        "reviewers-2"
-      ];
-    
 
-    const reviews = (await client
-      .repository
-      .repoListPullReviews({
+    await client
+      .issue
+      .issueCreateComment({
         owner,
         repo,
-        index: _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('pr') || 72,
-      }))
-
-    const orgTeams = await Promise.all((
-      await client
-        .organization
-        .orgListTeams({
-          org: owner,
-        })
-    ).map(
-      async (
-        team,
-      ) => ({
-        team,
-        members: await client
-          .organization
-          .orgListTeamMembers({
-            id: team.id,
-          })
+        index: _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('id') || process.argv[5],
+        body: {
+          description: _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('description') || process.argv[6],
+          body: _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('body') || process.argv[7],
+        },
       })
-    ));
-
-    const teamReviews = teams
-      .map(
-        (team) => ({
-          team,
-          reviews: reviews
-            .filter(
-              ({
-                state,
-                user,
-                team: teamObject,
-              }) => orgTeams
-                .find(
-                  ({
-                    team: {
-                      name,
-                    },
-                    members,
-                  }) => name === team
-                    && (teamObject || members
-                      .find(
-                        ({
-                          id: memberId
-                        }) => memberId === user.id,
-                      ))
-                ),
-            )
-        })
-      );
-    const nextTeamReview = teamReviews
-      .find(
-        ({
-          reviews,
-        }) => !reviews.length || reviews
-          .find(
-            ({
-              official,
-              stale,
-              dismissed,
-              state,
-            }) => official && (stale || dismissed || state !== 'APPROVED')
-          )
-      )
-    if (nextTeamReview) {
-      if (!nextTeamReview.reviews.filter(({ user }) => user).length) {
-        console.log(
-          JSON.stringify(
-            {
-              reason: 'team',
-              nextTeamReview,
-            },
-            null,
-            2,
-          )
-        )
-        await client.repository.repoCreatePullReviewRequests({
-          owner,
-          repo,
-          index: _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('pr') || 73,
-          body: {
-            team_reviewers: [
-              nextTeamReview.team
-            ]
-          },
-        });
-      } else {
-
-        console.log(
-          JSON.stringify(
-            {
-              reason: 'users',
-              nextTeamReview,
-              reviewers: nextTeamReview
-                .reviews
-                .filter(
-                  ({
-                    official,
-                    stale,
-                    dismissed,
-                    state,
-                    user,
-                  }) => user && official && (stale || dismissed || state !== 'APPROVED')
-                ).map(
-                  ({ user }) => user.login,
-                )
-            },
-            null,
-            2,
-          )
-        )
-
-        await client.repository.repoCreatePullReviewRequests({
-          owner,
-          repo,
-          index: _actions_core__WEBPACK_IMPORTED_MODULE_2__.getInput('pr') || 73,
-          body: {
-            reviewers: nextTeamReview
-              .reviews
-              .filter(
-                ({
-                  official,
-                  stale,
-                  dismissed,
-                  state,
-                  user,
-                }) => user && official && (stale || dismissed || state !== 'APPROVED')
-              ).map(
-                ({ user }) => user.login,
-              )
-          },
-        });
-      }
-    }
-
   }
   catch (error) {
+    console.error(error)
     _actions_core__WEBPACK_IMPORTED_MODULE_2__.setFailed(error.message);
   }
 }
