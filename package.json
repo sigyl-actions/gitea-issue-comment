@@ -1,0 +1,36 @@
+{
+  "name": "gitea-issue-comment",
+  "version": "0.0.1",
+  "description": "A simple action to comment on an issue.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint main.js",
+    "package": "ncc build main.js -o dist",
+    "build": "ncc build main.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sigyl-actions/gitea-issue-comment.git"
+  },
+  "keywords": [
+    "actions",
+    "gitea",
+    "release"
+  ],
+  "bugs": {
+    "url": "https://github.com/sigyl-actions/gitea-issue-comment/issues"
+  },
+  "homepage": "https://github.com/sigyl-actions/gitea-issue-comment#readme",
+  "author": "SiGyl",
+  "license": "MIT",
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "gitea-api": "^1.17.3-1"
+  }
+}

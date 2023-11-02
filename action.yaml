@@ -1,0 +1,20 @@
+---
+name: gitea-action-request-reviews
+description: >-
+  request pr reviews
+branding:
+  icon: package
+  color: green
+inputs:
+  id:
+    description: id of the issue
+  description:
+    description: comment description
+  body:
+    description: comment body
+  token:
+    description: 'The gitea token or personal access token'
+    required: false
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
