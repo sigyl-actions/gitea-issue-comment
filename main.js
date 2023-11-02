@@ -1,11 +1,8 @@
-import fs from 'fs';
-import { Blob } from 'buffer';
 
+const core = require('@actions/core');
+const github = require('@actions/github');
 
-import core from '@actions/core';
-import github from '@actions/github';
-
-import { GiteaApi } from 'gitea-api';
+const { GiteaApi } = require('gitea-api');
 
 async function run() {
   try {

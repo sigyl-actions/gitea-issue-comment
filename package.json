@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "A simple action to comment on an issue.",
   "main": "main.js",
-  "type": "module",
   "scripts": {
     "lint": "eslint main.js",
     "package": "ncc build main.js -o dist",
